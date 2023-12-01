@@ -1,45 +1,54 @@
 #include "binary_trees.h"
 
 /**
- * binary_trees_ancestor - function that finds the lowest common
- * ancestor of two nodes.
- * @first: pointer to the first node.
- * @second: pointer to the second node.
- * Return:  pointer to the lowest common ancestor node of the
- * two given nodes or return NULL if not found.
+ * binary_tree_depth - measures the depth of a node in a binary tree.
+ *@tree: pointer to the node to measure the depth.
+ * Return: if tree is NULL, function must return 0.
  */
-
-binary_tree_t *binary_trees_ancestor(const binary_tree_t *first, const binary_tree_t *second)
+size_t binary_tree_depth(const binary_tree_t *tree)
 {
-	binary_tree_t *ancestors[1024];
-	size_t first_ancestors = 0;
+	if (tree == NULL)
+		return (0);
+	else
+		return (1 + binary_tree_depth(tree->parent));
+}
+/**
+ * binary_trees_ancestor - finds the lowest common ancestor of two nodes
+ * @first: first node
+ * @second: second node
+ * Return: lowest common ancestor
+ */
+binary_tree_t *binary_trees_ancestor(const binary_tree_t *first,
+				     const binary_tree_t *second)
+{
+	size_t height_f = 0, height_s = 0;
+	const binary_tree_t *aux = NULL;
 
-	if (first == NULL || second == NULL)
+	height_f = binary_tree_depth(first);
+	height_s = binary_tree_depth(second);
+	if (height_f && height_s)
+	{
+		if (height_f > height_s)
+		{
+			aux = first;
+			first = second;
+			second = aux;
+		}
+		while (first)
+		{
+			aux = second;
+			while (aux)
+			{
+				if (first == aux)
+					return ((binary_tree_t *)first);
+				aux = aux->parent;
+			}
+			first = first->parent;
+		}
+	}
+	else
 	{
 		return (NULL);
-	}
-
-	if (first == second)
-	{
-		return ((binary_tree_t *)first);
-	}
-
-	while (first != NULL)
-	{
-		ancestors[first_ancestors++] = (binary_tree_t *)first;
-		first = first->parent;
-	}
-
-	while (second != NULL)
-	{
-		for (size_t i = 0; i < first_ancestors; i++)
-		{
-			if (second == ancestors[i])
-			{
-				return ((binary_tree_t *)second);
-			}
-		}
-		second = second->parent;
 	}
 	return (NULL);
 }
